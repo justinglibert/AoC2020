@@ -107,7 +107,7 @@ reduceMaybe xs = case foldr red (False, 0) xs of
       Nothing -> acc
 
 iterSize :: Int
-iterSize = 10 ^ 9
+iterSize = 10 ^ 10
 
 chunkSize :: Int
 chunkSize = 10 ^ 7
@@ -134,4 +134,4 @@ main = do
   -- part 2
   let buses = parseInput2 . last . lines $ c
   -- t = execState (simpleBrute buses) 0
-  solve 0 buses
+  solve 100000000000000 buses
