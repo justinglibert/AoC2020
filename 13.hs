@@ -21,7 +21,7 @@ cells = do
 remainingCells =
   (char '\n' >> return []) P.<|> (char ',' >> P.try (emptyCells P.<|> cells))
 
-parseFile :: P.GenParser Char st (Integer, [Integer])
+parseFile :: P.GenParser Char st (Int, [Int])
 parseFile = do
   a <- many P.digit
   let arrival = read a
@@ -33,24 +33,24 @@ digits = do
   c <- many P.digit
   return $ read c
 
-parseFile2 :: P.GenParser Char st [Integer]
+parseFile2 :: P.GenParser Char st [Int]
 parseFile2 = do
   a <- many P.digit
   let bus1 = read a
   mid <- many (char ',' >> ((char 'x' >> return 0) P.<|> digits))
   return $ bus1 : mid
 
-parseInput :: String -> (Integer, [Integer])
+parseInput :: String -> (Int, [Int])
 parseInput xs = case parse parseFile "parser" xs of
   Left err -> error $ show err
   Right val -> val
 
-parseInput2 :: String -> [Integer]
+parseInput2 :: String -> [Int]
 parseInput2 xs = case parse parseFile2 "parser2" xs of
   Left err -> error $ show err
   Right val -> val
 
-findFirstMatch :: Integer -> [Integer] -> State Integer Integer
+findFirstMatch :: Int -> [Int] -> State Int Int
 findFirstMatch arrival buses = do
   current <- get
   let matches = filter ((== 0) . mod (arrival + current)) buses
@@ -61,14 +61,14 @@ findFirstMatch arrival buses = do
     1 -> return $ current * head matches
     _ -> error "More than one match"
 
-verify :: Integer -> [Integer] -> Bool
+verify :: Int -> [Int] -> Bool
 verify t buses = and $ zipWith v [0 ..] buses
   where
     v i b = case b of
       0 -> True
-      _ -> (t + i) `mod` b == 0
+      _ -> (t + i) `rem` b == 0
 
-simpleBrute :: [Integer] -> State Integer ()
+simpleBrute :: [Int] -> State Int ()
 simpleBrute buses = do
   current <- get
   case verify current buses of
@@ -77,27 +77,27 @@ simpleBrute buses = do
       modify (+ 1)
       simpleBrute buses
 
-red :: [Bool] -> Maybe Integer
+red :: [Bool] -> Maybe Int
 red = go 0
   where
     go i [] = Nothing
     go i (True : _) = Just i
     go i (False : xs) = go (i + 1) xs
 
-brute :: [Integer] -> (Integer, Integer) -> Maybe Integer
+brute :: [Int] -> (Int, Int) -> Maybe Int
 brute buses (curr, high)
   | curr == high = Nothing
   | otherwise = case verify curr buses of
     True -> Just curr
     False -> brute buses ((curr + 1), high)
 
-chunkBrute :: Integer -> Integer -> Integer -> [(Integer, Integer)]
+chunkBrute :: Int -> Int -> Int -> [(Int, Int)]
 chunkBrute low high chunks = map createChunks [0 .. chunks - 1]
   where
     chunkS = (high - low) `div` chunks
     createChunks i = (low + i * chunkS, low + (i + 1) * chunkS)
 
-reduceMaybe :: [Maybe Integer] -> Maybe Integer
+reduceMaybe :: [Maybe Int] -> Maybe Int
 reduceMaybe xs = case foldr red (False, 0) xs of
   (True, a) -> Just a
   (False, _) -> Nothing
@@ -106,13 +106,13 @@ reduceMaybe xs = case foldr red (False, 0) xs of
       Just a -> (True, a)
       Nothing -> acc
 
-iterSize :: Integer
+iterSize :: Int
 iterSize = 10 ^ 9
 
-chunkSize :: Integer
+chunkSize :: Int
 chunkSize = 10 ^ 7
 
-chunks :: Integer
+chunks :: Int
 chunks = iterSize `div` chunkSize
 
 -- Use a solve that chunk stuff using with strategy for 10B iterations. If no succes we print and recurse
@@ -122,7 +122,7 @@ solve curr buses = do
       next = curr + iterSize
   case found of
     Just a -> print $ "Found! " ++ show a
-    Nothing -> (print $ "Iterating..." ++ show next) >> solve next buses
+    Nothing -> print ("Iterating..." ++ show next) >> solve next buses
 
 main = do
   [f] <- getArgs
