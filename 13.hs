@@ -125,7 +125,7 @@ solve curr buses = do
     Nothing -> print ("Iterating..." ++ show next) >> solve next buses
 
 main = do
-  [f] <- getArgs
+  [f, start] <- getArgs
   c <- readFile f
   -- part 1
   -- let (arrival, buses) = parseInput c
@@ -133,5 +133,6 @@ main = do
   -- print match
   -- part 2
   let buses = parseInput2 . last . lines $ c
+      low = read start
   -- t = execState (simpleBrute buses) 0
-  solve 100000000000000 buses
+  solve low buses
