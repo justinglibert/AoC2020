@@ -1,4 +1,5 @@
 {-# LANGUAGE DeriveFunctor #-}
+
 import           Text.Parsec.String
 import           Text.Parsec
 import           Text.Parsec.Combinator
