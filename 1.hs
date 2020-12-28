@@ -1,6 +1,6 @@
-import Control.Applicative
-import qualified Control.Monad as M
-import System.Environment
+import           Control.Applicative
+import qualified Control.Monad                 as M
+import           System.Environment
 
 main :: IO ()
 main = return ()
@@ -19,7 +19,8 @@ solve xs = do
   return $ fis * sec
 
 solve' :: [Int] -> [Int]
-solve' xs = map (\(f, s) -> f * s) . filter (\(f, s) -> f + s == 2020) $ (,) <$> xs <*> xs
+solve' xs =
+  map (uncurry (*)) . filter (\(f, s) -> f + s == 2020) $ (,) <$> xs <*> xs
 
 solve2 :: [Int] -> [Int]
 solve2 xs = do
